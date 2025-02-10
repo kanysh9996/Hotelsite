@@ -10,3 +10,5 @@ admin.site.register(Booking)
 admin.site.register(Rating)
 
 
+
+

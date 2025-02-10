@@ -80,8 +80,8 @@ class Booking(models.Model):
         ('reservation', 'reservation')
     )
     hotel_status = models.CharField(choices=HOTEL_STATUS, max_length=16, default='free')
-    check_unique = models.ForeignKey(Room, on_delete=models.CASCADE)
-    cancel_booking = models.ForeignKey(Room, on_delete=models.CASCADE)
+    check_unique = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='check_unique')
+    cancel_booking = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='cancel_booking')
 
     def str(self):
         return f'{self.user}'

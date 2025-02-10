@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import ( UserProfile, Country, Hotel, Room, RoomPhoto, Booking, Rating)
+from . models import ( UserProfile, Country, Hotel, Room,  Booking, Rating)
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:

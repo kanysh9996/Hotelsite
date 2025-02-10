@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import render
 from rest_framework import viewsets
 from .models import (UserProfile, Country, Hotel, Room, Booking, Rating)
 from .serializers import (UserProfileSerializer, CountrySerializer, HotelSerializer, RoomSerializer,
@@ -33,4 +34,5 @@ class BookingViewSet(viewsets.ModelViewSet):
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+
 
