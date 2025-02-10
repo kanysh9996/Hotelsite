@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -23,6 +22,7 @@ class UserProfile(AbstractUser):
 class Country(models.Model):
     country_name = models.CharField(max_length=32, unique=True)
     city_name = models.CharField(max_length=32, unique=True, null=True, blank=True)
+    hotel_address = models.CharField(max_length=32)
     country_image = models.ImageField(upload_to='country_image')
 
     def str(self):
@@ -34,24 +34,26 @@ class Hotel(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     HOTEL_STARS = (
-        ('1 stars', '1 stars'),
-        ('2 stars', '2 stars'),
         ('3 stars', '3 stars'),
         ('4 stars', '4 stars'),
         ('5 stars', '5 stars')
     )
-    hotel_stars = models.CharField(choices=HOTEL_STARS, max_length=12, default='1 stars')
+    hotel_stars = models.CharField(choices=HOTEL_STARS, max_length=12, default='3 stars')
+    hotel_description = models.TextField()
     date = models.DateField()
-    description = models.TextField()
-    hotel_image = models.ImageField(upload_to='hotel_image', null=True, blank=True)
 
     def str(self):
         return f'{self.hotel_name}, {self.user}, {self.country}'
 
 
-class Room(models.Model):
-    hotel_number = models.PositiveSmallIntegerField(default=1)
+class HotelPhoto(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    hotel_image = models.ImageField(upload_to='hotel_image')
+
+
+class Room(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    room_number = models.PositiveSmallIntegerField(default=1)
     HOTEL_TYPES = (
         ('standard', 'standard'),
         ('suite', 'suite'),
@@ -69,15 +71,16 @@ class RoomPhoto(models.Model):
 
 class Booking(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     booking_room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    check_unique = models.ForeignKey(Room, on_delete=models.CASCADE)
+    price = models.PositiveSmallIntegerField(default=0)
     HOTEL_STATUS = (
         ('free', 'free'),
         ('busy', 'busy'),
         ('reservation', 'reservation')
     )
     hotel_status = models.CharField(choices=HOTEL_STATUS, max_length=16, default='free')
-    price = models.PositiveSmallIntegerField(default=0)
+    check_unique = models.ForeignKey(Room, on_delete=models.CASCADE)
     cancel_booking = models.ForeignKey(Room, on_delete=models.CASCADE)
 
     def str(self):
@@ -85,7 +88,8 @@ class Booking(models.Model):
 
 
 class Rating(models.Model):
-    user = models.OneToOneField(Hotel, on_delete=models.CASCADE)
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    rating_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     stars = models.IntegerField(choices=[(i, str(i)) for i in range (1, 6)])
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     text = models.TextField()
