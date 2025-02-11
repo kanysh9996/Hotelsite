@@ -1,55 +1,55 @@
 from rest_framework import viewsets, generics
 from .models import (UserProfile, Country, Hotel, Room, Booking, Rating)
-from .serializers import (UserProfileSerializer, CountrySerializer,  CountryWideSerializer,
-                          HotelSerializer, HotelWideSerializer, RoomSerializer, RoomsSerializer,
-                          BookingSerializer, RatingSerializer)
+from .serializers import (UserProfileSerializer,  CountryListSerializer,  CountryDetailSerializer, HotelCreateSerializer,
+                          HotelListSerializer, HotelDetailSerializer, RoomSerializer, RoomsSerializer,
+                          BookingSerializer, RatingListSerializer, RatingDetailSerializer)
 from django_filters .rest_framework import DjangoFilterBackend
 from .filters import HotelFiler
 from rest_framework .filters import SearchFilter, OrderingFilter
+from .permissions import CheckStatus, CheckRatings, CheckBooking
 
-class UserProfileAPIView(generics.ListAPIView):
+
+class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
-    def get_queryset(self):
-        return UserProfile.objects.filter(id=self.request.user.id)
-
-class UsersProfileAPIView(generics.CreateAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
 
     def get_queryset(self):
         return UserProfile.objects.filter(id=self.request.user.id)
 
 
-class CountryAPIView(generics.ListAPIView):
+class CountryListAPIView(generics.ListAPIView):
     queryset = Country.objects.all()
-    serializer_class = CountrySerializer
+    serializer_class = CountryListSerializer
 
-class CountryWideAPIView(generics.RetrieveAPIView):
+
+class CountryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
-    serializer_class = CountryWideSerializer
+    serializer_class = CountryDetailSerializer
 
 
-class HotelAPIView(generics.ListAPIView):
+class HotelCreateViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
-    serializer_class = HotelSerializer
+    serializer_class = HotelCreateSerializer
+    permission_classes = [CheckStatus]
+
+
+
+class HotelListAPIView(generics.ListAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class = HotelListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['hotel_name']
     ordering_fields = ['price']
     filterset_class = HotelFiler
 
 
-<<<<<<< HEAD
-class RoomViewSet(viewsets.ModelViewSet):
-=======
-class HotelWideAPIView(generics.RetrieveAPIView):
+class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
-    serializer_class = HotelWideSerializer
+    serializer_class = HotelDetailSerializer
 
 
 class RoomAPIView(generics.ListAPIView):
->>>>>>> 2e9562ba21e163f486c94f55caa765845d42219b
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
@@ -62,10 +62,18 @@ class RoomSAPIView(generics.ListAPIView):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [CheckBooking]
 
 
-class RatingAPIView(generics.CreateAPIView):
+class RatingListAPIView(generics.ListCreateAPIView):
     queryset = Rating.objects.all()
-    serializer_class = RatingSerializer
+    serializer_class = RatingListSerializer
+    permission_classes = [CheckRatings]
+
+
+class RatingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingDetailSerializer
+
 
 

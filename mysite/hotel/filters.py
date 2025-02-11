@@ -6,5 +6,5 @@ class HotelFiler(FilterSet):
         model = Hotel
         fields ={
             'country': ['exact'],
-            'hotel_stars': ['exact'],
+            'date': ['exact'],
         }

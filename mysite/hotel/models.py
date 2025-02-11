@@ -14,7 +14,7 @@ class UserProfile(AbstractUser):
     )
     status = models.CharField(choices=STATUS_CHOICES, max_length=16, default='client')
 
-    def str(self):
+    def __str__(self):
         return f'{self.first_name}, {self.last_name}'
 
 
@@ -22,9 +22,10 @@ class Country(models.Model):
     country_name = models.CharField(max_length=32, unique=True)
     city_name = models.CharField(max_length=32, unique=True, null=True, blank=True)
     hotel_address = models.CharField(max_length=32)
+    country_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True, related_name='country_user')
     country_image = models.ImageField(upload_to='country_image')
 
-    def str(self):
+    def __str__(self):
         return f'{self.country_name}, {self.city_name}'
 
 
@@ -39,10 +40,9 @@ class Hotel(models.Model):
     )
     hotel_stars = models.CharField(choices=HOTEL_STARS, max_length=12, default='3 stars')
     hotel_description = models.TextField()
-    date = models.DateField()
-    price = models.PositiveSmallIntegerField(default=0)
+    date = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f'{self.hotel_name}, {self.user}, {self.country}'
 
 
@@ -54,15 +54,13 @@ class Hotel(models.Model):
        return 0
 
 
-
-
 class HotelPhoto(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel_photos')
     hotel_image = models.ImageField(upload_to='hotel_image')
 
 
 class Room(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel_room')
     room_number = models.PositiveSmallIntegerField(default=1)
     HOTEL_TYPES = (
         ('standard', 'standard'),
@@ -70,9 +68,16 @@ class Room(models.Model):
         ('apartment', 'apartment')
     )
     hotel_types = models.CharField(choices=HOTEL_TYPES, max_length=12, default='standard')
+    price = models.PositiveSmallIntegerField(default=0)
+    HOTEL_STATUS = (
+        ('free', 'free'),
+        ('busy', 'busy'),
+        ('reservation', 'reservation')
+    )
+    hotel_status = models.CharField(choices=HOTEL_STATUS, max_length=16, default='free')
 
-    def str(self):
-        return self.hotel
+    def __str__(self):
+        return f'{self.room_number}, {self.hotel}'
 
 class RoomPhoto(models.Model):
     room_image = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_list')
@@ -83,16 +88,11 @@ class Booking(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     booking_room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    HOTEL_STATUS = (
-        ('free', 'free'),
-        ('busy', 'busy'),
-        ('reservation', 'reservation')
-    )
-    hotel_status = models.CharField(choices=HOTEL_STATUS, max_length=16, default='free')
-    check_unique = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='check_unique')
-    cancel_booking = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='cancel_booking')
+    go_in = models.DateField()
+    go_out = models.DateField()
 
-    def str(self):
+
+    def __str__(self):
         return f'{self.user}'
 
 
@@ -104,5 +104,5 @@ class Rating(models.Model):
     text = models.TextField()
     rating_date = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f'{self.user}, {self.text}'
