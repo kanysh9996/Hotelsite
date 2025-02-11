@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -41,6 +40,7 @@ class Hotel(models.Model):
     hotel_stars = models.CharField(choices=HOTEL_STARS, max_length=12, default='3 stars')
     hotel_description = models.TextField()
     date = models.DateField()
+    price = models.PositiveSmallIntegerField(default=0)
 
     def str(self):
         return f'{self.hotel_name}, {self.user}, {self.country}'
@@ -73,7 +73,7 @@ class Booking(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     booking_room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    price = models.PositiveSmallIntegerField(default=0)
+
     HOTEL_STATUS = (
         ('free', 'free'),
         ('busy', 'busy'),

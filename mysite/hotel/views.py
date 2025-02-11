@@ -1,10 +1,11 @@
-from django.shortcuts import render
-from django.shortcuts import render
 from rest_framework import viewsets
 from .models import (UserProfile, Country, Hotel, Room, Booking, Rating)
 from .serializers import (UserProfileSerializer, CountrySerializer, HotelSerializer, RoomSerializer,
                           BookingSerializer, RatingSerializer)
+from django_filters .rest_framework import DjangoFilterBackend
+from .filters import HotelFiler
 
+from rest_framework .filters import SearchFilter, OrderingFilter
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
@@ -19,6 +20,12 @@ class CountryViewSet(viewsets.ModelViewSet):
 class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['hotel_name']
+    ordering_fields = ['price']
+    filterset_class = HotelFiler
+
+
 
 
 class RoomViewSet(viewsets.ModelViewSet):
