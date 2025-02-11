@@ -7,6 +7,4 @@ class HotelFiler(FilterSet):
         fields ={
             'country': ['exact'],
             'hotel_stars': ['exact'],
-
-
         }

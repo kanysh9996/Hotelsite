@@ -10,6 +10,7 @@ class RatingTranslationOptions(TranslationOptions):
 class HotelTranslationOptions(TranslationOptions):
     fields = ('hotel_description', )
 
+
 @register(Country)
 class CountryTranslationOptions(TranslationOptions):
     fields = ('country_name', 'city_name', 'hotel_address' )

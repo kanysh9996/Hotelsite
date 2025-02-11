@@ -73,7 +73,6 @@ class Booking(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     booking_room = models.ForeignKey(Room, on_delete=models.CASCADE)
-
     HOTEL_STATUS = (
         ('free', 'free'),
         ('busy', 'busy'),

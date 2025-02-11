@@ -26,8 +26,6 @@ class HotelViewSet(viewsets.ModelViewSet):
     filterset_class = HotelFiler
 
 
-
-
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
