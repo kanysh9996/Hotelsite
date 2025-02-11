@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'django_filters',
     'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
@@ -148,6 +149,10 @@ MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'hotel.UserProfile'
 
+<<<<<<< HEAD
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+=======
+
+>>>>>>> 2e9562ba21e163f486c94f55caa765845d42219b

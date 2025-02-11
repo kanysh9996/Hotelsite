@@ -30,8 +30,8 @@ class Country(models.Model):
 
 class Hotel(models.Model):
     hotel_name = models.CharField(max_length=32)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE,)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_hotel')
     HOTEL_STARS = (
         ('3 stars', '3 stars'),
         ('4 stars', '4 stars'),
@@ -46,8 +46,18 @@ class Hotel(models.Model):
         return f'{self.hotel_name}, {self.user}, {self.country}'
 
 
+    def get_avg_rating(self):
+       totol = self.rating_hotel.all()
+       if totol.exists():
+           return round(sum([i.stars for i in totol]) /  totol.count(), 1)
+
+       return 0
+
+
+
+
 class HotelPhoto(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel_photos')
     hotel_image = models.ImageField(upload_to='hotel_image')
 
 
@@ -65,7 +75,7 @@ class Room(models.Model):
         return self.hotel
 
 class RoomPhoto(models.Model):
-    room_image = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room_image = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_list')
     image = models.ImageField(upload_to='room_image')
 
 
@@ -88,7 +98,7 @@ class Booking(models.Model):
 
 class Rating(models.Model):
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    rating_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    rating_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rating_hotel')
     stars = models.IntegerField(choices=[(i, str(i)) for i in range (1, 6)])
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     text = models.TextField()
