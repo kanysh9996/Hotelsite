@@ -1,23 +1,37 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from .models import (UserProfile, Country, Hotel, Room, Booking, Rating)
-from .serializers import (UserProfileSerializer, CountrySerializer, HotelSerializer, RoomSerializer,
+from .serializers import (UserProfileSerializer, CountrySerializer,  CountryWideSerializer,
+                          HotelSerializer, HotelWideSerializer, RoomSerializer, RoomsSerializer,
                           BookingSerializer, RatingSerializer)
 from django_filters .rest_framework import DjangoFilterBackend
 from .filters import HotelFiler
-
 from rest_framework .filters import SearchFilter, OrderingFilter
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileAPIView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
+    def get_queryset(self):
+        return UserProfile.objects.filter(id=self.request.user.id)
 
-class CountryViewSet(viewsets.ModelViewSet):
+class UsersProfileAPIView(generics.CreateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(id=self.request.user.id)
+
+
+class CountryAPIView(generics.ListAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
+class CountryWideAPIView(generics.RetrieveAPIView):
+    queryset = Country.objects.all()
+    serializer_class = CountryWideSerializer
 
-class HotelViewSet(viewsets.ModelViewSet):
+
+class HotelAPIView(generics.ListAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -26,11 +40,19 @@ class HotelViewSet(viewsets.ModelViewSet):
     filterset_class = HotelFiler
 
 
+class HotelWideAPIView(generics.RetrieveAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class = HotelWideSerializer
 
 
-class RoomViewSet(viewsets.ModelViewSet):
+class RoomAPIView(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+
+
+class RoomSAPIView(generics.ListAPIView):
+    queryset = Room.objects.all()
+    serializer_class = RoomsSerializer
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -38,7 +60,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
 
 
-class RatingViewSet(viewsets.ModelViewSet):
+class RatingAPIView(generics.CreateAPIView):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 

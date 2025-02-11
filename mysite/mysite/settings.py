@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'django_filters',
     'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
@@ -147,3 +148,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'hotel.UserProfile'
+
+
