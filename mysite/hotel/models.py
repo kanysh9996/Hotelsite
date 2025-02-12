@@ -53,6 +53,9 @@ class Hotel(models.Model):
 
        return 0
 
+    def count_people(self):
+        return self.rating_hotel.count()
+
 
 class HotelPhoto(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel_photos')

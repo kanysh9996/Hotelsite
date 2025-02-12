@@ -128,15 +128,19 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     hotel_room = RoomSimpleSerializer(many=True, read_only=True)
     rating_hotel = RatingSerializer(many=True,read_only=True)
     date = serializers.DateTimeField(format('%d-%m-%Y'))
+    count_people =serializers.ModelSerializer()
 
     class Meta:
         model = Hotel
         fields = ['hotel_name', 'country', 'hotel_stars', 'hotel_description',
-                  'date', 'hotel_photos', 'user', 'get_avg_rating', 'hotel_room', 'rating_hotel']
+                  'date', 'hotel_photos', 'user', 'get_avg_rating', 'hotel_room', 'rating_hotel', 'count_people']
 
 
     def get_avg_rating(self,obj):
         return obj.get_avg_rating()
+
+    def count_people(self,obj):
+        return obj.count_people()
 
 
 class RatingDetailSerializer(serializers.ModelSerializer):
