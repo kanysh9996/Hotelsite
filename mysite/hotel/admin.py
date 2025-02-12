@@ -1,4 +1,5 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 from .models import *
 
 
@@ -6,8 +7,19 @@ class HotelPhotoInLine(admin.TabularInline):
     model = HotelPhoto
     extra = 1
 
+
+class RoomPhotoInLine(admin.TabularInline):
+    model = RoomPhoto
+    extra = 1
+
+
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    inlines = [RoomPhotoInLine]
+
+
 @admin.register(Hotel)
-class HotelAdmin(admin.ModelAdmin):
+class HotelAdmin(TranslationAdmin):
     inlines = [HotelPhotoInLine]
 
     class Media:
@@ -20,15 +32,8 @@ class HotelAdmin(admin.ModelAdmin):
             'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
         }
 
-
-class RoomPhotoInLine(admin.TabularInline):
-    model = RoomPhoto
-    extra = 1
-
-@admin.register(Room)
-class RoomAdmin(admin.ModelAdmin):
-    inlines = [RoomPhotoInLine]
-
+@admin.register(Country, Rating)
+class AllAdmin(TranslationAdmin):
     class Media:
         js = (
             'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
@@ -39,8 +44,6 @@ class RoomAdmin(admin.ModelAdmin):
             'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
         }
 
-
 admin.site.register(UserProfile)
-admin.site.register(Country)
 admin.site.register(Booking)
-admin.site.register(Rating)
+

@@ -1,5 +1,41 @@
 from rest_framework import serializers
 from . models import ( UserProfile, Country, Hotel, HotelPhoto, Room,  Booking, Rating, RoomPhoto)
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('username', 'email', 'password', 'first_name', 'last_name',
+                  'age', 'phone_number', 'status')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = UserProfile.objects.create_user(**validated_data)
+        return user
+
+    def to_representation(self, instance):
+        refresh = RefreshToken.for_user(instance)
+        return {
+            'user': {
+                'username': instance.username,
+                'email': instance.email,
+            },
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(**data)
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Неверные учетные данные")
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -61,17 +97,6 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ['id', 'user', 'stars', 'parent', 'text', 'rating_date']
 
-class RatingListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = ['id', 'user', 'rating_hotel', 'stars', 'parent', 'text', 'rating_date']
-
-
-class RatingDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = '__all__'
-
 
 class HotelCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,6 +114,11 @@ class HotelListSerializer(serializers.ModelSerializer):
         fields = ['id', 'hotel_name', 'country', 'hotel_photos', 'hotel_description']
 
 
+class RatingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['id', '']
+
 
 class HotelDetailSerializer(serializers.ModelSerializer):
     user = UserSimpleProfileSerializer()
@@ -96,7 +126,7 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     hotel_photos = HotelPhotoSerializer(many=True, read_only=True)
     get_avg_rating = serializers.SerializerMethodField()
     hotel_room = RoomSimpleSerializer(many=True, read_only=True)
-    rating_hotel = RatingSerializer(many=True)
+    rating_hotel = RatingSerializer(many=True,read_only=True)
     date = serializers.DateTimeField(format('%d-%m-%Y'))
 
     class Meta:
@@ -107,6 +137,13 @@ class HotelDetailSerializer(serializers.ModelSerializer):
 
     def get_avg_rating(self,obj):
         return obj.get_avg_rating()
+
+
+class RatingDetailSerializer(serializers.ModelSerializer):
+    rating_hotel = HotelListSerializer()
+    class Meta:
+        model = Rating
+        fields = ['user', 'stars', 'parent', 'text', 'rating_date', 'rating_hotel']
 
 
 class CountryDetailSerializer(serializers.ModelSerializer):
@@ -131,8 +168,9 @@ class RoomsSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    user = UserSimpleProfileSerializer()
     class Meta:
         model = Booking
-        fields = '__all__'
+        fields = ['user', 'booking_hotel', 'booking_room', 'go_in', 'go_out']
 
 
