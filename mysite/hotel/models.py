@@ -78,6 +78,7 @@ class Room(models.Model):
         ('reservation', 'reservation')
     )
     hotel_status = models.CharField(choices=HOTEL_STATUS, max_length=16, default='free')
+    all_inclusive = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.room_number}, {self.hotel}'
@@ -89,7 +90,7 @@ class RoomPhoto(models.Model):
 
 class Booking(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='booking_hotel')
     booking_room = models.ForeignKey(Room, on_delete=models.CASCADE)
     go_in = models.DateField()
     go_out = models.DateField()
@@ -102,7 +103,7 @@ class Booking(models.Model):
 class Rating(models.Model):
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     rating_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rating_hotel')
-    stars = models.IntegerField(choices=[(i, str(i)) for i in range (1, 6)])
+    stars = models.IntegerField(choices=[(i, str(i)) for i in range (1, 11)])
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     text = models.TextField()
     rating_date = models.DateTimeField(auto_now_add=True)

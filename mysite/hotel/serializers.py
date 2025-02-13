@@ -50,8 +50,14 @@ class UserSimpleProfileSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name']
 
 
+class CountryHotelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['city_name', 'country_name']
+
+
 class UserProProfileSerializer(serializers.ModelSerializer):
-    country_user = UserProfileSerializer(many=True, read_only=True)
+    country_user = CountryHotelSerializer(many=True, read_only=True)
     class Meta:
         model = UserProfile
         fields = ['first_name', 'country_user']
@@ -61,12 +67,6 @@ class CountryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = ['id', 'city_name', 'country_image']
-
-
-class CountryHotelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = ['city_name', 'country_name' ]
 
 
 
@@ -83,10 +83,11 @@ class HotelPhotoSerializer(serializers.ModelSerializer):
 
 
 class RoomSimpleSerializer(serializers.ModelSerializer):
-    room_image = RoomPhotoSerializer(many=True, read_only=True)
+    room_list = RoomPhotoSerializer(many=True, read_only=True)
+
     class Meta:
         model = Room
-        fields = ['id', 'room_number', 'hotel_types', 'price', 'hotel_status', 'room_image']
+        fields = ['id', 'room_number', 'hotel_types', 'price', 'hotel_status', 'all_inclusive', 'room_list']
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -95,7 +96,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-        fields = ['id', 'user', 'stars', 'parent', 'text', 'rating_date']
+        fields = ['id', 'user', 'stars', 'text', 'rating_date']
 
 
 class HotelCreateSerializer(serializers.ModelSerializer):
@@ -114,10 +115,26 @@ class HotelListSerializer(serializers.ModelSerializer):
         fields = ['id', 'hotel_name', 'country', 'hotel_photos', 'hotel_description']
 
 
+class CountryDetailSerializer(serializers.ModelSerializer):
+    country_hotel = HotelListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Country
+        fields = ['country_name', 'city_name', 'hotel_address', 'country_image', 'country_hotel']
+
+
+
 class RatingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
-        fields = ['id', '']
+        fields = ['user', 'rating_hotel', 'stars', 'parent', 'text', 'rating_date']
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    user = UserSimpleProfileSerializer()
+    class Meta:
+        model = Booking
+        fields = ['user', 'booking_hotel', 'booking_room', 'go_in', 'go_out']
 
 
 class HotelDetailSerializer(serializers.ModelSerializer):
@@ -128,12 +145,14 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     hotel_room = RoomSimpleSerializer(many=True, read_only=True)
     rating_hotel = RatingSerializer(many=True,read_only=True)
     date = serializers.DateTimeField(format('%d-%m-%Y'))
-    count_people =serializers.ModelSerializer()
+    count_people =serializers.SerializerMethodField()
+    booking_hotel = BookingSerializer(many=True, read_only=True)
 
     class Meta:
         model = Hotel
-        fields = ['hotel_name', 'country', 'hotel_stars', 'hotel_description',
-                  'date', 'hotel_photos', 'user', 'get_avg_rating', 'hotel_room', 'rating_hotel', 'count_people']
+        fields = ['hotel_name', 'hotel_photos', 'country', 'hotel_stars', 'hotel_description',
+                  'date', 'user', 'get_avg_rating', 'count_people', 'hotel_room', 'rating_hotel',
+                   'booking_hotel']
 
 
     def get_avg_rating(self,obj):
@@ -150,14 +169,6 @@ class RatingDetailSerializer(serializers.ModelSerializer):
         fields = ['user', 'stars', 'parent', 'text', 'rating_date', 'rating_hotel']
 
 
-class CountryDetailSerializer(serializers.ModelSerializer):
-    country_hotel = HotelListSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Country
-        fields = ['country_name', 'city_name', 'hotel_address', 'country_image', 'country_hotel']
-
-
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
@@ -169,12 +180,5 @@ class RoomsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['hotel', 'room_number', 'hotel_types', 'room_list']
-
-
-class BookingSerializer(serializers.ModelSerializer):
-    user = UserSimpleProfileSerializer()
-    class Meta:
-        model = Booking
-        fields = ['user', 'booking_hotel', 'booking_room', 'go_in', 'go_out']
 
 

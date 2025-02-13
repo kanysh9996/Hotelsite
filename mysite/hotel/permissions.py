@@ -16,7 +16,7 @@ class CheckRatings(permissions.BasePermission):
 
 class CheckBooking(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.user.status == 'client':
+        if request.user.status == 'client' and obj.user == 'client':
             return True
         return False
 
